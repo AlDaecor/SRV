@@ -14,7 +14,7 @@ Before starting, the user must check if the next list of libraries are installed
 # Pytesseract
 For Pytesseract it's better to use the next installer, that way the PATH will be configured automatically:
 
-[Tesseract-OCR-w64-setup-5.3.1.20230401.exe](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe)(64 bit)
+[Tesseract-OCR-w64-setup-5.3.1.20230401.exe](https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe) (64 bit)
 
 
 # CODE DESCRIPTION
