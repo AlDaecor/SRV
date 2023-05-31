@@ -60,7 +60,7 @@ space to open, so the user can type the keywords they are looking for, separated
 'test' : The last word of the command will be referred to the name the user wishes to give to the output logs.
 
 
-#ADDENDUMS:
+# ADDENDUMS:
 
 This is a very WIP file with the only purpose to quickly explain the main functions of the code, a proper document is in progress that will have a better 
 structure and description to every command
