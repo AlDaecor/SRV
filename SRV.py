@@ -23,6 +23,7 @@ def takePicture():
         if ret == True:
             cv2.imshow('video', image)
             cv2.waitKey(1)
+            cv2.destroyAllWindows()
     
     cap.release()
 
@@ -190,7 +191,8 @@ while True:
 
         # Might move this 2 next lines into the function
         imgTemplate = cv2.imread('templates/template{}.jpg'.format(userlist[1]))
-        
+        #imgTemplate = takePicture()
+        #Input = imgTemplate.copy()
         output = ImageCrop(imgTemplate)
         iconoutput = output.copy()
         wordoutput = output.copy()
@@ -250,6 +252,8 @@ while True:
         now = datetime.now()
         dt_string = now.strftime('%d_%m_%Y %H_%M_%S')
         cv2.imwrite("logs/{}_{}.jpeg".format(userlist[5], dt_string),output)
+        #cv2.imshow('input', Input)
+        #cv2.waitKey()
 
     # Exit command
     elif userlist[0] == 'exit':
