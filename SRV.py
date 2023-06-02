@@ -131,6 +131,7 @@ def WordId (list, image):
     """In charge of recognizing the words the user is looking for"""
     
     for word in list:
+        nonResponse = image.copy()
         turn = 0
         wordflag = []
         d = pytesseract.image_to_data(image, output_type=Output.DICT)
@@ -157,8 +158,12 @@ def WordId (list, image):
 
                 turn = 5
         
-    if wordflag == 0:
-        print()
+        if len(wordflag) == 0:
+            print('the word: "{}" was not found, please be sure to type it as it should appear'.format(word))
+            image = nonResponse
+        
+        #if wordflag == 0:
+        #    image = nonResponse
 
     return image
 
