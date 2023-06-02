@@ -141,35 +141,34 @@ while True:
         print('Now in "look" mode')
 
         # Might move this 2 next lines into the function
-        imgTemplate = cv2.imread('templates/template{}.jpg'.format(userlist[1]))
-        #imgTemplate = takePicture()
-        #Input = imgTemplate.copy()
+        #imgTemplate = cv2.imread('templates/template{}.jpg'.format(userlist[1]))
+        imgTemplate = cv2.imread('templates/templateIRL.png')
         output = ImageCrop(imgTemplate)
         iconoutput = output.copy()
         wordoutput = output.copy()
 
-        if userlist[4] != 'false':
-            if userlist[4] == 'true':
+        if userlist[2] != 'false':
+            if userlist[2] == 'true':
                 userwordi = input('Type the key words separated by commas and without spaces unless needed so:\n> ')
                 keywords = userwordi.split(',')
                 wordoutput = WordId(keywords, wordoutput)
             else:
                 print('only "true" or "false" can go into the keywords parameter')
         
-        if userlist[3] != 'null': # Fourth element in the vector corresponds to the icons the user wants to find
+        if userlist[1] != 'null': # Fourth element in the vector corresponds to the icons the user wants to find
             
-            userlist_Icons = userlist[3].split(',')
+            userlist_Icons = userlist[1].split(',')
             cleanlist_Icons = []
             dir_path = 'icons/'
             counter = 0
 
-            if '*' in userlist[3]:
+            if '*' in userlist[1]:
                 print('todos')
                 for path in os.listdir(dir_path):
                     if os.path.isfile(os.path.join(dir_path, path)):
                         counter += 1    
 
-            elif userlist[3] != '*':
+            elif userlist[1] != '*':
                 for icon in userlist_Icons:
                     if '{}.png'.format(icon) not in os.listdir(dir_path):
                         print('"{}" not present in the available icons\nignoring input.'.format(icon))
@@ -189,9 +188,7 @@ while True:
 
         now = datetime.now()
         dt_string = now.strftime('%d_%m_%Y %H_%M_%S')
-        cv2.imwrite("logs/{}_{}.jpeg".format(userlist[5], dt_string),output)
-        #cv2.imshow('input', Input)
-        #cv2.waitKey()
+        cv2.imwrite("logs/{}_{}.jpeg".format(userlist[3], dt_string),output)
 
     # Exit command
     elif userlist[0] == 'exit':
