@@ -58,55 +58,6 @@ def ImageCrop(template):
     return output
 
 
-def ColorId (list,image):
-    """In charge of recognizing the colors the user is looking for"""
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    if 'cyan' in list: 
-        thresh = cv2.inRange(hsv, np.array([60, 50, 50], np.uint8), np.array([155, 250, 250], np.uint8))
-        #cyan_range = [(np.array([60, 50, 50], np.uint8)),       # Cyan lower limit
-        #                (np.array([155, 255, 255], np.uint8))]  # Cyan upper limit
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-        if len(cnts) > 0:
-            print('Color cyan was found...')
-            for c in cnts:
-                (x, y, w, h) = cv2.boundingRect(c)
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        else:
-            print("Color cyan wasn't found... ")
- 
-    if 'red' in list:
-        thresh = cv2.inRange(hsv, np.array([160, 50, 50], np.uint8), np.array([180, 250, 250], np.uint8))
-        #red_range = [(np.array([160, 50, 50], np.uint8)),       # Red lower limit
-        #                (np.array([180, 255, 255], np.uint8))]  # Red upper limit
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        cnts = imutils.grab_contours(cnts)
-        if len(cnts) > 0:
-            print('Color red was found...')
-            for c in cnts:
-                (x, y, w, h) = cv2.boundingRect(c)
-                cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        else:
-            print("Color red wasn't found..." )
-
-    if 'orange' in list:
-        thresh = cv2.inRange(hsv, np.array([5, 50, 50], np.uint8), np.array([15, 250, 250], np.uint8))
-        #orange_range = [(np.array([5, 50, 50], np.uint8)),      # Orange lower limit
-        #                (np.array([15, 255, 255], np.uint8))]   # Orange upper limit
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-        if len(cnts) > 0:
-            print('Color orange was found...')
-            for c in cnts:
-                (x, y, w, h) = cv2.boundingRect(c)
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        else:
-            print("Color orange wasn't found...")
-    
-    return image
-
-
 def PatternId (list,image):
     """In charge of recognizing the patterns the user is looking for"""
     for pattern in list:
@@ -204,18 +155,6 @@ while True:
                 wordoutput = WordId(keywords, wordoutput)
             else:
                 print('only "true" or "false" can go into the keywords parameter')
-
-        if userlist[2] != 'null': # the third element in the vector corresponds to the color the user is looking for
-
-            userlist_Colors = userlist[2].split(',') # split the first command item into a vector depending on the user input
-
-            if '*' in userlist_Colors:
-                userlist_Colors = ['red', 'orange', 'cyan']
-                
-            if 'red' not in userlist_Colors and 'orange' not in userlist_Colors and 'cyan' not in userlist_Colors:
-                print('Color not available, please try again with one of the available colors (Red, Orange, Cyan)')
-
-            coloroutput = ColorId(userlist_Colors, output)
         
         if userlist[3] != 'null': # Fourth element in the vector corresponds to the icons the user wants to find
             
@@ -246,7 +185,6 @@ while True:
         # we obtain all the results the user is looking for and we add them all into a single image, ready to be logged
         alpha = 0.4
         output = cv2.addWeighted(wordoutput, alpha, output, 1 - alpha, 0)
-        output = cv2.addWeighted(coloroutput, alpha, output, 1 - alpha, 0)
         output = cv2.addWeighted(iconoutput, alpha, output, 1 - alpha, 0)
 
         now = datetime.now()
