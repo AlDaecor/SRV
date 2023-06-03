@@ -51,12 +51,6 @@ def ImageCrop(template):
     outputw, outputh, output_ = output.shape
 
     output = cv2.resize(output, (0,0), fx=(refw/outputw), fy=(refh/outputh))
-    sharpen_filter=np.array([[-1,-1,-1],
-                             [-1,9,-1],
-                             [-1,-1,-1]])
-    output = cv2.filter2D(output, -1, sharpen_filter)
-    cv2.imshow('sharp', output)
-    cv2.waitKey()
     return output
 
 
