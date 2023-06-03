@@ -17,14 +17,12 @@ pytesseract.pytesseract.tesseract_cmd = 'c:/Program Files/Tesseract-OCR/tesserac
 def takePicture():
     """Captures a video of about 4 seconds to clean and load the image properly"""
     cap = cv2.VideoCapture(0)
-
     for i in range(0, 29):
         ret, image = cap.read()
         if ret == True:
             cv2.imshow('video', image)
             cv2.waitKey(1)
-            cv2.destroyAllWindows()
-    
+    cv2.destroyAllWindows()
     cap.release()
 
     return image
@@ -52,9 +50,13 @@ def ImageCrop(template):
     refw, refh, ref_ = Ref.shape
     outputw, outputh, output_ = output.shape
 
-    #if para considerar si la template (la imagen que tomo la camara) es mas grande que la de referencia
     output = cv2.resize(output, (0,0), fx=(refw/outputw), fy=(refh/outputh))
-
+    sharpen_filter=np.array([[-1,-1,-1],
+                             [-1,9,-1],
+                             [-1,-1,-1]])
+    output = cv2.filter2D(output, -1, sharpen_filter)
+    cv2.imshow('sharp', output)
+    cv2.waitKey()
     return output
 
 
@@ -119,6 +121,12 @@ def WordId (list, image):
 
     return image
 
+def centerNumber(image):
+    thresh = cv2.threshold(image, 150, 255, cv2.THRESH_BINARY_INV)[1]
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+    result = 255 - opening
+    print(pytesseract.image_to_string(result))
 
 #*****************************************************************************************************************************
 # Main code
@@ -142,7 +150,7 @@ while True:
 
         # Might move this 2 next lines into the function
         #imgTemplate = cv2.imread('templates/template{}.jpg'.format(userlist[1]))
-        imgTemplate = cv2.imread('templates/templateIRL.png')
+        imgTemplate = takePicture()
         output = ImageCrop(imgTemplate)
         iconoutput = output.copy()
         wordoutput = output.copy()
