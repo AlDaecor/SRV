@@ -74,54 +74,17 @@ def PatternId (list,image):
     
     return image
 
-
-def WordId (list, image):
-    """In charge of recognizing the words the user is looking for"""
-    
-    for word in list:
-        nonResponse = image.copy()
-        turn = 0
-        wordflag = []
-        d = pytesseract.image_to_data(image, output_type=Output.DICT)
-        n_boxes = len(d['level'])
-
-        while turn <= 4:
-            turn += 1
-            for i in range(n_boxes):
-                text = d['text'][i]
-                if text == word:
-                    (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
-                    wordflag.append((x,y,w,h))
-                    #print(wordflag)
-                    cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), -1)
-
-            if len(wordflag) == 0:
-                image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-
-            elif len(wordflag) == 1:
-                turnsleft = 5 - turn
-                while turnsleft > 0:
-                    image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-                    turnsleft -= 1
-
-                turn = 5
-        
-        if len(wordflag) == 0:
-            print('the word: "{}" was not found, please be sure to type it as it should appear'.format(word))
-            image = nonResponse
-        
-        #if wordflag == 0:
-        #    image = nonResponse
-
-    return image
-
 def centerNumber(image):
-    thresh = cv2.threshold(image, 150, 255, cv2.THRESH_BINARY_INV)[1]
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
+    thresh = cv2.threshold(image, 135, 255, cv2.THRESH_BINARY_INV)[1]
+    cv2.imshow('thresh', thresh)
+    cv2.waitKey()
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
     result = 255 - opening
-    print(pytesseract.image_to_string(result))
+    result = pytesseract.image_to_string(thresh, config=" --psm 6")
 
+    print(result)
 #*****************************************************************************************************************************
 # Main code
 while True:
@@ -143,19 +106,10 @@ while True:
         print('Now in "look" mode')
 
         # Might move this 2 next lines into the function
-        #imgTemplate = cv2.imread('templates/template{}.jpg'.format(userlist[1]))
         imgTemplate = takePicture()
         output = ImageCrop(imgTemplate)
+        centerNumber(output)
         iconoutput = output.copy()
-        wordoutput = output.copy()
-
-        if userlist[2] != 'false':
-            if userlist[2] == 'true':
-                userwordi = input('Type the key words separated by commas and without spaces unless needed so:\n> ')
-                keywords = userwordi.split(',')
-                wordoutput = WordId(keywords, wordoutput)
-            else:
-                print('only "true" or "false" can go into the keywords parameter')
         
         if userlist[1] != 'null': # Fourth element in the vector corresponds to the icons the user wants to find
             
@@ -181,16 +135,14 @@ while True:
                 iconoutput=PatternId(cleanlist_Icons,iconoutput)
                 #cv2.imshow('icon output', iconoutput)
                 #cv2.waitKey()
-    
 
         # we obtain all the results the user is looking for and we add them all into a single image, ready to be logged
         alpha = 0.4
-        output = cv2.addWeighted(wordoutput, alpha, output, 1 - alpha, 0)
         output = cv2.addWeighted(iconoutput, alpha, output, 1 - alpha, 0)
 
         now = datetime.now()
         dt_string = now.strftime('%d_%m_%Y %H_%M_%S')
-        cv2.imwrite("logs/{}_{}.jpeg".format(userlist[3], dt_string),output)
+        cv2.imwrite("logs/{}_{}.jpeg".format(userlist[2], dt_string),output)
 
     # Exit command
     elif userlist[0] == 'exit':
