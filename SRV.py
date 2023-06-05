@@ -24,7 +24,6 @@ def takePicture():
             cv2.waitKey(1)
     cv2.destroyAllWindows()
     cap.release()
-
     return image
     
 
@@ -56,6 +55,7 @@ def ImageCrop(template):
 
 def PatternId (list,image):
     """In charge of recognizing the patterns the user is looking for"""
+    answer = []
     for pattern in list:
         icon = cv2.imread('icons/{}.png'.format(pattern))
         w,h,_ = icon.shape
@@ -68,29 +68,38 @@ def PatternId (list,image):
         percentage = max_val*100
         percentage = str(round(percentage, 2))
         if max_val >= .60:
-            print('{} has been identified with a {}%'.format(pattern, percentage), 'of accuracy')
+            answer.append('{} has been identified with a {}%'.format(pattern, percentage) + ' of accuracy')
         else:
-            print("{} wasn't identified in the image".format(pattern))
+            answer.append("{} wasn't identified in the image".format(pattern))
     
-    return image
+    return image,answer
 
 def centerNumber(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
-    thresh = cv2.threshold(image, 135, 255, cv2.THRESH_BINARY_INV)[1]
-    cv2.imshow('thresh', thresh)
-    cv2.waitKey()
+    thresh = cv2.threshold(image, 120, 255, cv2.THRESH_BINARY_INV)[1]
+    #cv2.imshow('thresh', thresh)
+    #cv2.waitKey()
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
     result = 255 - opening
     result = pytesseract.image_to_string(thresh, config=" --psm 6")
 
     print(result)
+
+def loggingCommand(log, text, id):
+    now = datetime.now()
+    dt_string = now.strftime('%d-%m-%Y_%H-%M-%S')
+    if id == "received":
+        log.append(">{}| Command received: ({})".format(dt_string, text))
+    elif id == "record":
+        print(text)
+        log.append(">{}| Record logged: ({})".format(dt_string, text))
+
 #*****************************************************************************************************************************
 # Main code
 while True:
     # Receive the command from the user
     useri = input('>')
-
     # Clean and divide the input into segments and turn the whole input into lowercase letters
     useri = str(useri).lower()
     userlist = useri.split(' ')
@@ -102,12 +111,19 @@ while True:
 
     # Look mode - to look for colors, patterns or words. either all at once or just certain options
     elif userlist[0] == 'look':
+        log = []
+        loggingCommand(log, useri, "received")
+        
         # Entered look mode, which will look for colors and patterns
-        print('Now in "look" mode')
+        loggingCommand(log, 'Now in "look" mode...', "record")
 
         # Might move this 2 next lines into the function
         imgTemplate = takePicture()
+        loggingCommand(log, 'image taken...', "record")\
+        
         output = ImageCrop(imgTemplate)
+        loggingCommand(log, 'image cropped and cleaned...', "record")
+
         centerNumber(output)
         iconoutput = output.copy()
         
@@ -127,12 +143,14 @@ while True:
             elif userlist[1] != '*':
                 for icon in userlist_Icons:
                     if '{}.png'.format(icon) not in os.listdir(dir_path):
-                        print('"{}" not present in the available icons\nignoring input.'.format(icon))
+                        loggingCommand(log, '"{}" not present in the available icons, discarding input...'.format(icon), "record")
                     if '{}.png'.format(icon) in os.listdir(dir_path):
-                        print('icon accepted...')
+                        loggingCommand(log, 'icon accepted...', "record")
                         cleanlist_Icons.append(icon)
                 
-                iconoutput=PatternId(cleanlist_Icons,iconoutput)
+                iconoutput,answer=PatternId(cleanlist_Icons,iconoutput)
+                for i in answer:
+                    loggingCommand(log, i, "record")
                 #cv2.imshow('icon output', iconoutput)
                 #cv2.waitKey()
 
@@ -141,8 +159,11 @@ while True:
         output = cv2.addWeighted(iconoutput, alpha, output, 1 - alpha, 0)
 
         now = datetime.now()
-        dt_string = now.strftime('%d_%m_%Y %H_%M_%S')
+        dt_string = now.strftime('%d-%m-%Y _%H-%M-%S')
         cv2.imwrite("logs/{}_{}.jpeg".format(userlist[2], dt_string),output)
+        with open('logs/{}_{}.txt'.format(userlist[2],dt_string), 'w') as f:
+            for i in log:
+                f.write(i+"\n")
 
     # Exit command
     elif userlist[0] == 'exit':
