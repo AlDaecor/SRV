@@ -5,7 +5,7 @@
 
 Before starting, the user must check if the next list of libraries are installed in the device:
 
--Cv2
+-Opencv
 -Numpy
 -Os
 -Imutils
