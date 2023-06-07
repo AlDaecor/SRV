@@ -84,7 +84,11 @@ def centerNumber(image):
     invert = 255 - opening
 
     result = pytesseract.image_to_string(invert)
-    print(result)
+    result = list(str(result))
+    result.insert(-1,'.')
+    result = ''.join(result)
+    
+    return result
 
 def loggingCommand(log, text, id):
     now = datetime.now()
@@ -124,7 +128,9 @@ while True:
         output = ImageCrop(imgTemplate)
         loggingCommand(log, 'image cropped and cleaned...', "record")
 
-        centerNumber(output)
+        result = centerNumber(output)
+        loggingCommand(log, 'registered temperature number: {}'.format(result), "record")
+        
         iconoutput = output.copy()
         
         if userlist[1] != 'null': # Fourth element in the vector corresponds to the icons the user wants to find
