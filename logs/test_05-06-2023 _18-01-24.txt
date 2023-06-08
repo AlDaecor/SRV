@@ -1,0 +1,8 @@
+>05-06-2023_18-01-22| Command received: (look waterdrop,moreoptions test)
+>05-06-2023_18-01-22| Record logged: (Now in "look" mode...)
+>05-06-2023_18-01-24| Record logged: (image taken...)
+>05-06-2023_18-01-24| Record logged: (image cropped and cleaned...)
+>05-06-2023_18-01-24| Record logged: (icon accepted...)
+>05-06-2023_18-01-24| Record logged: (icon accepted...)
+>05-06-2023_18-01-24| Record logged: (waterdrop has been identified with a 73.23% of accuracy)
+>05-06-2023_18-01-24| Record logged: (moreoptions has been identified with a 70.85% of accuracy)
